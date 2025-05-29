@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Aitrich Student ID Cards</title>
+  <style>
+      * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffff;
+      font-family: "Arial", sans-serif;
+      color: #fff;
+      padding: 0;
+    }
+
+    /* Screen styles */
+    @media screen {
+      body {
+        padding: 20px;
+      }
+
+      .page-container {
+        margin-bottom: 40px;
+      }
+
+      .page-title {
+        text-align: center;
+        color: #3c06ff;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        padding: 0;
+      }
+
+      .page-container {
+        page-break-after: always;
+        width: 210mm;
+        height: 297mm;
+        padding: 10mm;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-content: flex-start;
+      }
+
+      .page-container:last-child {
+        page-break-after: avoid;
+      }
+
+      .page-title {
+        display: none;
+      }
+
+      .id-card {
+        background: white !important;
+        border: 2px solid #333 !important;
+        color: #333 !important;
+        box-shadow: none !important;
+      }
+
+      .company-name {
+        color: #333 !important;
+      }
+
+      .name {
+        color: #000 !important;
+      }
+
+      .details {
+        color: #555 !important;
+      }
+    }
+
+    .page-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 15mm;
+      width: 210mm;
+      height: 297mm;
+      padding: 15mm;
+      margin: 0 auto;
+    }
+
+    .id-card {
+      width: 5.3cm;
+      height: 9.2cm;
+      background: #ffffff;
+      color: #400bff;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    /* Simplified curved background using a single background image */
+    .curved-top {
+      width: 100%;
+      height: 45%;
+      background: linear-gradient(135deg, #4a90e2 0%, #2563eb 50%, #1d4ed8 100%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 10px;
+      border-radius: 0 0 50% 50%;
+    }
+
+    .curved-top::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 70%);
+      border-radius: 0 0 50% 50%;
+    }
+
+    .company-name {
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    .bottom-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      padding: 15px 10px;
+      background: white;
+    }
+
+    .name {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1a1a1a;
+      line-height: 1.2;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .details {
+      font-size: 10px;
+      color: #4a4a4a;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .qr {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr img {
+      width: 85px;
+      height: 85px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Button styles */
+    .button-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .action-button {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+    }
+
+    .export-button {
+      background: linear-gradient(135deg, #2196F3, #1976D2);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    }
+
+    .export-button:hover {
+      box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+    }
+
+    @media print {
+      .button-container {
+        display: none;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+</head>
+
+<body>
+  <button onclick="downloadAllCards()">📷 Export Cards as PNG</button>
+  <button class="print-button" onclick="window.print()">🖨️ Print Cards</button>
+
+  <h2 class="page-title">Aitrich Student ID Cards</h2>
+
+  <div id="cardContainer"></div>
+
+  <script>
+    // Sample student data - replace with your actual data
+    const students = [
+      {
+        "Member Email": "abel23cs@cce.edu.in",
+        name: "ABEL J KOLAPRAN",
+        id: "CCE23CS001",
+      },
+      {
+        "Member Email": "abhay23cs@cce.edu.in",
+        name: "ABHAY ACHUTHAN R",
+        id: "CCE23CS002",
+      },
+      {
+        "Member Email": "abhijithcs23cs@cce.edu.in",
+        name: "ABHIJITH C S",
+        id: "CCE23CS003",
+      },
+      {
+        "Member Email": "abhijithps23cs@cce.edu.in",
+        name: "ABHIJITH P S",
+        id: "CCE23CS004",
+      },
+      {
+        "Member Email": "abhinav23cs@cce.edu.in",
+        name: "ABHINAV C M",
+        id: "CCE23CS005",
+      },
+      {
+        "Member Email": "addwin23cs@cce.edu.in",
+        name: "ADDWIN ALANOLIKKAL",
+        id: "CCE23CS006",
+      },
+      {
+        "Member Email": "adhithya23cs@cce.edu.in",
+        name: "ADHITHYA SUBASH",
+        id: "CCE23CS007",
+      },
+      {
+        "Member Email": "adith23cs@cce.edu.in",
+        name: "ADITH V A",
+        id: "CCE23CS008",
+      },
+      {
+        "Member Email": "adithyan23cs@cce.edu.in",
+        name: "ADITHYAN C P",
+        id: "CCE23CS009",
+      },
+      {
+        "Member Email": "agatha23cs@cce.edu.in",
+        name: "AGATHA VARGHESE UKKEN",
+        id: "CCE23CS010",
+      },
+      {
+        "Member Email": "agnel23cs@cce.edu.in",
+        name: "AGNEL CHACKOCHAN",
+        id: "CCE23CS011",
+      },
+      {
+        "Member Email": "agnes23cs@cce.edu.in",
+        name: "AGNES REEJO PARAYIL",
+        id: "CCE23CS012",
+      },
+      {
+        "Member Email": "airin23cs@cce.edu.in",
+        name: "AIRIN JERRY",
+        id: "CCE23CS013",
+      },
+      {
+        "Member Email": "ajil23cs@cce.edu.in",
+        name: "AJIL DENNY",
+        id: "CCE23CS014",
+      },
+      {
+        "Member Email": "alan23cs@cce.edu.in",
+        name: "ALAN JAMES",
+        id: "CCE23CS015",
+      },
+      {
+        "Member Email": "aldrin23cs@cce.edu.in",
+        name: "ALDRIN ANDRUS KANNAI",
+        id: "CCE23CS016",
+      },
+      {
+        "Member Email": "allen23cs@cce.edu.in",
+        name: "ALLEN P JISON",
+        id: "CCE23CS017",
+      },
+      {
+        "Member Email": "ambalika23cs@cce.edu.in",
+        name: "AMBALIKA E S",
+        id: "CCE23CS018",
+      },
+      {
+        "Member Email": "ammu23cs@cce.edu.in",
+        name: "AMMU ANN JOHN",
+        id: "CCE23CS019",
+      },
+      {
+        "Member Email": "amrutha23cs@cce.edu.in",
+        name: "AMRUTHA ROSHAN",
+        id: "CCE23CS020",
+      },
+      {
+        "Member Email": "anandukrishna23cs@cce.edu.in",
+        name: "ANANDUKRISHNA V S",
+        id: "CCE23CS021",
+      },
+      {
+        "Member Email": "ananthakrishnan23cs@cce.edu.in",
+        name: "ANANTHAKRISHNAN T A",
+        id: "CCE23CS022",
+      },
+      {
+        "Member Email": "angelina23cs@cce.edu.in",
+        name: "ANGELINA ANTO",
+        id: "CCE23CS023",
+      },
+      {
+        "Member Email": "angeljojo23cs@cce.edu.in",
+        name: "ANGEL JOJO",
+        id: "CCE23CS024",
+      },
+      {
+        "Member Email": "angelmary23cs@cce.edu.in",
+        name: "ANGEL MARY ANTONY",
+        id: "CCE23CS025",
+      },
+      {
+        "Member Email": "angelrose23cs@cce.edu.in",
+        name: "ANGEL ROSE P Y",
+        id: "CCE23CS026",
+      },
+      {
+        "Member Email": "anita23cs@cce.edu.in",
+        name: "ANITA BIJU",
+        id: "CCE23CS027",
+      },
+      {
+        "Member Email": "annagrace23cs@cce.edu.in",
+        name: "ANNA GRACE RAJU",
+        id: "CCE23CS028",
+      },
+      {
+        "Member Email": "annashaji23cs@cce.edu.in",
+        name: "ANNA SHAJI",
+        id: "CCE23CS029",
+      },
+      {
+        "Member Email": "annatom23cs@cce.edu.in",
+        name: "ANNA TOM",
+        id: "CCE23CS030",
+      },
+      {
+        "Member Email": "annjohnson23cs@cce.edu.in",
+        name: "ANN JOHNSON",
+        id: "CCE23CS031",
+      },
+      {
+        "Member Email": "anntherese23cs@cce.edu.in",
+        name: "ANN THERESE AJI",
+        id: "CCE23CS032",
+      },
+      {
+        "Member Email": "anntheresp23cs@cce.edu.in",
+        name: "ANN THERES P",
+        id: "CCE23CS033",
+      },
+      {
+        "Member Email": "antonyfrancis23cs@cce.edu.in",
+        name: "ANTONY FRANCIS CHETHALAN",
+        id: "CCE23CS034",
+      },
+      {
+        "Member Email": "antonyjenson23cs@cce.edu.in",
+        name: "ANTONY JENSON A",
+        id: "CCE23CS035",
+      },
+      {
+        "Member Email": "aravind23cs@cce.edu.in",
+        name: "ARAVIND K S",
+        id: "CCE23CS036",
+      },
+      {
+        "Member Email": "ardhra23cs@cce.edu.in",
+        name: "ARDHRA V S",
+        id: "CCE23CS037",
+      },
+      {
+        "Member Email": "arya23cs@cce.edu.in",
+        name: "ARYA SUDHEER C",
+        id: "CCE23CS038",
+      },
+      {
+        "Member Email": "ashna23cs@cce.edu.in",
+        name: "ASHNA TONY",
+        id: "CCE23CS039",
+      },
+      {
+        "Member Email": "ashwin23cs@cce.edu.in",
+        name: "ASHWIN ANTONY NELSON",
+        id: "CCE23CS040",
+      },
+      {
+        "Member Email": "austin23cs@cce.edu.in",
+        name: "AUSTIN SHAJAN",
+        id: "CCE23CS041",
+      },
+      {
+        "Member Email": "blessy23cs@cce.edu.in",
+        name: "BLESSY C B",
+        id: "CCE23CS042",
+      },
+      {
+        "Member Email": "carolin23cs@cce.edu.in",
+        name: "CAROLIN WILSON CHIRAMAL",
+        id: "CCE23CS043",
+      },
+      {
+        "Member Email": "christy23cs@cce.edu.in",
+        name: "CHRISTY BIJU",
+        id: "CCE23CS044",
+      },
+      {
+        "Member Email": "cindrel23cs@cce.edu.in",
+        name: "CINDREL SHAJAN",
+        id: "CCE23CS045",
+      },
+      {
+        "Member Email": "david23cs@cce.edu.in",
+        name: "DAVID RITTO ROBIN",
+        id: "CCE23CS046",
+      },
+      {
+        "Member Email": "devangana23cs@cce.edu.in",
+        name: "DEVANGANA T S",
+        id: "CCE23CS047",
+      },
+      {
+        "Member Email": "dhasarath23cs@cce.edu.in",
+        name: "DHASARATH P A",
+        id: "CCE23CS048",
+      },
+      {
+        "Member Email": "diya23cs@cce.edu.in",
+        name: "DIYA FATHIMA C S",
+        id: "CCE23CS049",
+      },
+      {
+        "Member Email": "diyanha23cs@cce.edu.in",
+        name: "DIYANHA FATHIMA PATHAPULLY DILIP",
+        id: "CCE23CS050",
+      },
+      {
+        "Member Email": "edwin23cs@cce.edu.in",
+        name: "EDWIN SHAJU MALAKARAN",
+        id: "CCE23CS051",
+      },
+      {
+        "Member Email": "emil23cs@cce.edu.in",
+        name: "EMIL ROSE VINCENT",
+        id: "CCE23CS053",
+      },
+      {
+        "Member Email": "emmanuel23cs@cce.edu.in",
+        name: "EMMANUEL K BABU",
+        id: "CCE23CS054",
+      },
+      {
+        "Member Email": "eric23cs@cce.edu.in",
+        name: "ERIC JOSE",
+        id: "CCE23CS055",
+      },
+      {
+        "Member Email": "evelyn23cs@cce.edu.in",
+        name: "EVELYN ROSE KJ",
+        id: "CCE23CS056",
+      },
+      {
+        "Member Email": "farhan23cs@cce.edu.in",
+        name: "FARHAN M JEEJO",
+        id: "CCE23CS057",
+      },
+      {
+        "Member Email": "femi23cs@cce.edu.in",
+        name: "FEMI P BIJU",
+        id: "CCE23CS058",
+      },
+      {
+        "Member Email": "francis23cs@cce.edu.in",
+        name: "FRANCIS ANTO",
+        id: "CCE23CS059",
+      },
+      {
+        "Member Email": "gail23cs@cce.edu.in",
+        name: "GAIL ANIMESH K",
+        id: "CCE23CS060",
+      },
+      {
+        "Member Email": "gautham23cs@cce.edu.in",
+        name: "GAUTHAM MADHAV",
+        id: "CCE23CS061",
+      },
+      {
+        "Member Email": "gayathri23cs@cce.edu.in",
+        name: "GAYATHRI GIREESAN",
+        id: "CCE23CS062",
+      },
+      {
+        "Member Email": "george23cs@cce.edu.in",
+        name: "GEORGE ATTOKKARAN JOSE",
+        id: "CCE23CS063",
+      },
+      {
+        "Member Email": "gino23cs@cce.edu.in",
+        name: "GINO GEO",
+        id: "CCE23CS064",
+      },
+      {
+        "Member Email": "gloria23cs@cce.edu.in",
+        name: "GLORIA STEEPHAN",
+        id: "CCE23CS065",
+      },
+      {
+        "Member Email": "grace23cs@cce.edu.in",
+        name: "GRACE PAUL",
+        id: "CCE23CS066",
+      },
+      {
+        "Member Email": "helan23cs@cce.edu.in",
+        name: "HELAN JOBY",
+        id: "CCE23CS067",
+      },
+      {
+        "Member Email": "hevin23cs@cce.edu.in",
+        name: "HEVIN STEPHY",
+        id: "CCE23CS068",
+      },
+      {
+        "Member Email": "hridya23cs@cce.edu.in",
+        name: "HRIDYA VARGHESE",
+        id: "CCE23CS069",
+      },
+      {
+        "Member Email": "iris23cs@cce.edu.in",
+        name: "IRIS WILSON",
+        id: "CCE23CS070",
+      },
+      {
+        "Member Email": "janwin23cs@cce.edu.in",
+        name: "JANWIN JOSEPH JAIN",
+        id: "CCE23CS071",
+      },
+      {
+        "Member Email": "jeswin23cs@cce.edu.in",
+        name: "JESWIN JOSHY",
+        id: "CCE23CS072",
+      },
+      {
+        "Member Email": "jewel23cs@cce.edu.in",
+        name: "E J JEWEL",
+        id: "CCE23CS052",
+      },
+      {
+        "Member Email": "jilsa23cs@cce.edu.in",
+        name: "JILSA MARIYA P J",
+        id: "CCE23CS073",
+      },
+      {
+        "Member Email": "jiyanna23cs@cce.edu.in",
+        name: "JIYANNA MARIA",
+        id: "CCE23CS074",
+      },
+      {
+        "Member Email": "jolyon23cs@cce.edu.in",
+        name: "JOLYON PAUL P",
+        id: "CCE23CS075",
+      },
+      {
+        "Member Email": "jovita23cs@cce.edu.in",
+        name: "JOVITA PIOUS",
+        id: "CCE23CS076",
+      },
+      {
+        "Member Email": "kanishka23cs@cce.edu.in",
+        name: "KANISHKA VENUGOPAL",
+        id: "CCE23CS077",
+      },
+      {
+        "Member Email": "kevin23cs@cce.edu.in",
+        name: "KEVIN C SHAJU",
+        id: "CCE23CS078",
+      },
+      {
+        "Member Email": "kiran23cs@cce.edu.in",
+        name: "KIRAN S",
+        id: "CCE23CS079",
+      },
+      {
+        "Member Email": "lewin23cs@cce.edu.in",
+        name: "LEWIN ROBIN",
+        id: "CCE23CS081",
+      },
+      {
+        "Member Email": "lisa23cs@cce.edu.in",
+        name: "LISA ANN JOSE",
+        id: "CCE23CS082",
+      },
+      {
+        "Member Email": "mafnan23cs@cce.edu.in",
+        name: "MUHAMMAD AFNAN",
+        id: "CCE23CS091",
+      },
+      {
+        "Member Email": "mariamejo23cs@cce.edu.in",
+        name: "MARIA MEJO",
+        id: "CCE23CS083",
+      },
+      {
+        "Member Email": "mariyajohn23cs@cce.edu.in",
+        name: "MARIYA JOHN",
+        id: "CCE23CS084",
+      },
+      {
+        "Member Email": "mariyasaju23cs@cce.edu.in",
+        name: "MARIYA SAJU",
+        id: "CCE23CS085",
+      },
+      {
+        "Member Email": "melit23cs@cce.edu.in",
+        name: "MELIT JOFFY",
+        id: "CCE23CS086",
+      },
+      {
+        "Member Email": "merlyn23cs@cce.edu.in",
+        name: "MERLYN ANTONY KUNDUPARAMBIL",
+        id: "CCE23CS087",
+      },
+      {
+        "Member Email": "mhanan23cs@cce.edu.in",
+        name: "MOHAMMED HANAN",
+        id: "CCE23CS089",
+      },
+      {
+        "Member Email": "michel23cs@cce.edu.in",
+        name: "MICHEL TREASA SAJI",
+        id: "CCE23CS088",
+      },
+      {
+        "Member Email": "mroshan23cs@cce.edu.in",
+        name: "MOHAMMED ROSHAN P R",
+        id: "CCE23CS090",
+      },
+      {
+        "Member Email": "niveditha23cs@cce.edu.in",
+        name: "NIVEDITHA AJAY",
+        id: "CCE23CS092",
+      },
+      {
+        "Member Email": "nivedya23cs@cce.edu.in",
+        name: "K NIVEDYA NANDAN",
+        id: "CCE23CS080",
+      },
+      {
+        "Member Email": "noel23cs@cce.edu.in",
+        name: "NOEL JOPHY",
+        id: "CCE23CS093",
+      },
+      {
+        "Member Email": "olivia23cs@cce.edu.in",
+        name: "OLIVIA THOMMANA",
+        id: "CCE23CS094",
+      },
+      {
+        "Member Email": "paadithyan23cs@cce.edu.in",
+        name: "P A ADITHYAN",
+        id: "CCE23CS095",
+      },
+      {
+        "Member Email": "patricia23cs@cce.edu.in",
+        name: "PATRICIA PAUL",
+        id: "CCE23CS096",
+      },
+      {
+        "Member Email": "powell23cs@cce.edu.in",
+        name: "POWELL CHAKOLA",
+        id: "CCE23CS097",
+      },
+      {
+        "Member Email": "pranaya23cs@cce.edu.in",
+        name: "PRANAYA BALAKRISHNAN",
+        id: "CCE23CS098",
+      },
+      {
+        "Member Email": "rachel23cs@cce.edu.in",
+        name: "RACHEL REEGAN",
+        id: "CCE23CS099",
+      },
+      {
+        "Member Email": "ragalaya23cs@cce.edu.in",
+        name: "RAGALAYA T R",
+        id: "CCE23CS100",
+      },
+      {
+        "Member Email": "rahul23cs@cce.edu.in",
+        name: "RAHUL ROY",
+        id: "CCE23CS101",
+      },
+      {
+        "Member Email": "rasin23cs@cce.edu.in",
+        name: "RASIN SIJOY",
+        id: "CCE23CS102",
+      },
+      {
+        "Member Email": "rinoj23cs@cce.edu.in",
+        name: "RINOJ SAJU M",
+        id: "CCE23CS103",
+      },
+      {
+        "Member Email": "rose23cs@cce.edu.in",
+        name: "ROSE BENNY",
+        id: "CCE23CS104",
+      },
+      {
+        "Member Email": "ruben23cs@cce.edu.in",
+        name: "RUBEN ROY",
+        id: "CCE23CS105",
+      },
+      {
+        "Member Email": "sahal23cs@cce.edu.in",
+        name: "SAHAL SHAMEER",
+        id: "CCE23CS106",
+      },
+      {
+        "Member Email": "sandhras23cs@cce.edu.in",
+        name: "SANDHRA S",
+        id: "CCE23CS107",
+      },
+      {
+        "Member Email": "sandrap23cs@cce.edu.in",
+        name: "SANDRA P NELLISSERY",
+        id: "CCE23CS108",
+      },
+      {
+        "Member Email": "sandrasunil23cs@cce.edu.in",
+        name: "SANDRA SUNIL",
+        id: "CCE23CS109",
+      },
+      {
+        "Member Email": "saniasaj23cs@cce.edu.in",
+        name: "SANIA SAJ",
+        id: "CCE23CS110",
+      },
+      {
+        "Member Email": "sanit23cs@cce.edu.in",
+        name: "SANIT A AMBOOKKAN",
+        id: "CCE23CS111",
+      },
+      {
+        "Member Email": "saniyamilton23cs@cce.edu.in",
+        name: "SANIYA MILTON",
+        id: "CCE23CS112",
+      },
+      {
+        "Member Email": "sayooj23cs@cce.edu.in",
+        name: "SAYOOJ S THERATTIL",
+        id: "CCE23CS113",
+      },
+      {
+        "Member Email": "sidharth23cs@cce.edu.in",
+        name: "SIDHARTH K S",
+        id: "CCE23CS114",
+      },
+      {
+        "Member Email": "siva23cs@cce.edu.in",
+        name: "SIVA PRAKASH",
+        id: "CCE23CS116",
+      },
+      {
+        "Member Email": "sivani23cs@cce.edu.in",
+        name: "SIVANI J PANICKER",
+        id: "CCE23CS115",
+      },
+      {
+        "Member Email": "sneha23cs@cce.edu.in",
+        name: "SNEHA NIXON",
+        id: "CCE23CS117",
+      },
+      {
+        "Member Email": "sonu23cs@cce.edu.in",
+        name: "SONU P S",
+        id: "CCE23CS118",
+      },
+      {
+        "Member Email": "sooraj23cs@cce.edu.in",
+        name: "SOORAJ SUNIL",
+        id: "CCE23CS119",
+      },
+      {
+        "Member Email": "sreesum23cs@cce.edu.in",
+        name: "SREEMSUN ANAND",
+        id: "CCE23CS120",
+      },
+      {
+        "Member Email": "sreyaharidas23cs@cce.edu.in",
+        name: "SREYA HARIDAS",
+        id: "CCE23CS121",
+      },
+      {
+        "Member Email": "sreyathambi23cs@cce.edu.in",
+        name: "SREYA THAMBI",
+        id: "CCE23CS122",
+      },
+      {
+        "Member Email": "thaliya23cs@cce.edu.in",
+        name: "THALIYA M ABEY",
+        id: "CCE23CS123",
+      },
+      {
+        "Member Email": "theresrose23cs@cce.edu.in",
+        name: "THERESROSE VILSAN",
+        id: "CCE23CS124",
+      },
+      {
+        "Member Email": "uthara23cs@cce.edu.in",
+        name: "UTHARA KRISHNA C K",
+        id: "CCE23CS125",
+      },
+      {
+        "Member Email": "vismaya23cs@cce.edu.in",
+        name: "VISMAYA R",
+        id: "CCE23CS126",
+      },
+    ];
+
+    function toBase64(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function () {
+          const canvas = document.createElement('canvas');
+          canvas.width = this.width;
+          canvas.height = this.height;
+          canvas.getContext('2d').drawImage(this, 0, 0);
+          resolve(canvas.toDataURL());
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    const container = document.getElementById("cardContainer");
+    const cardsPerPage = 4;
+
+    async function generateCards(students) {
+      for (let i = 0; i < students.length; i += cardsPerPage) {
+        const pageStudents = students.slice(i, i + cardsPerPage);
+
+        const pageContainer = document.createElement("div");
+        pageContainer.className = "page-container";
+
+        for (const student of pageStudents) {
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(student.id)}&size=200x200`;
+          const qrBase64 = await toBase64(qrUrl);
+
+          const card = document.createElement("div");
+          card.className = "id-card";
+
+          card.innerHTML = `
+            <div class="curved-top">
+            </div>
+            <div class="bottom-section">
+              <div class="name">${student.name}</div>
+              <div class="details">
+                <p><strong>ID:</strong> ${student.id}</p>
+              </div>
+              <div class="qr">
+                <img src="${qrBase64}" alt="QR Code">
+              </div>
+            </div>
+          `;
+
+          pageContainer.appendChild(card);
+        }
+
+        container.appendChild(pageContainer);
+      }
+    }
+
+    generateCards(students);
+
+    async function downloadAllCards() {
+      const cards = document.querySelectorAll('.id-card');
+      const totalCards = cards.length;
+      
+      // Show progress
+      console.log(`Starting download of ${totalCards} student cards...`);
+      
+      // Sequential download to ensure no cards are missed
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        
+        try {
+          console.log(`Processing card ${i + 1} of ${totalCards}...`);
+          
+          // Wait a moment between each card to prevent browser overload
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
+          
+          const canvas = await html2canvas(card, {
+            useCORS: true,
+            allowTaint: true,
+            scale: 2, // Reduced scale for faster processing
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: card.offsetWidth,
+            height: card.offsetHeight,
+            onclone: function(clonedDoc) {
+              const clonedCard = clonedDoc.querySelector('.id-card');
+              if (clonedCard) {
+                clonedCard.style.boxShadow = 'none';
+              }
+            }
+          });
+          
+          // Get student info from the card content
+          const studentName = card.querySelector('.name').textContent.trim();
+          const studentId = card.querySelector('.details p').textContent.replace('ID: ', '').trim();
+          
+          // Create download with sequential numbering
+          const link = document.createElement('a');
+          link.download = `${studentId}.png`;
+          link.href = canvas.toDataURL('image/png', 1.0);
+          
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          console.log(`✓ Downloaded: ${link.download}`);
+          
+        } catch (error) {
+          console.error(`✗ Error generating card ${i + 1}:`, error);
+          // Continue with next card even if one fails
+        }
+      }
+      
+      console.log(`Completed download process. ${totalCards} cards processed.`);
+      alert(`Download complete! ${totalCards} student cards have been downloaded.`);
+    }
+  </script>
+</body>
+
+</html>

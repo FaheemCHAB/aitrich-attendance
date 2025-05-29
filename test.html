@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Aitrich Student ID Cards</title>
+  <style>
+      * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #ffff;
+      font-family: "Arial", sans-serif;
+      color: #fff;
+      padding: 0;
+    }
+
+    /* Screen styles */
+    @media screen {
+      body {
+        padding: 20px;
+      }
+
+      .page-container {
+        margin-bottom: 40px;
+      }
+
+      .page-title {
+        text-align: center;
+        color: #3c06ff;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+        padding: 0;
+      }
+
+      .page-container {
+        page-break-after: always;
+        width: 210mm;
+        height: 297mm;
+        padding: 10mm;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-content: flex-start;
+      }
+
+      .page-container:last-child {
+        page-break-after: avoid;
+      }
+
+      .page-title {
+        display: none;
+      }
+
+      .id-card {
+        background: white !important;
+        border: 2px solid #333 !important;
+        color: #333 !important;
+        box-shadow: none !important;
+      }
+
+      .curved-bg {
+        background: linear-gradient(135deg, #4a90e2, #2563eb) !important;
+      }
+
+      .company-name {
+        color: #333 !important;
+      }
+
+      .name {
+        color: #000 !important;
+      }
+
+      .details {
+        color: #555 !important;
+      }
+
+      .photo {
+        border-color: #333 !important;
+      }
+
+      .controls-panel {
+        display: none !important;
+      }
+    }
+
+    .page-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 15mm;
+      width: 210mm;
+      height: 297mm;
+      padding: 15mm;
+      margin: 0 auto;
+    }
+
+    .id-card {
+      width: 5.3cm;
+      height: 9.2cm;
+      background: #ffffff;
+      color: #400bff;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      border: 1px solid #000;
+    }
+
+    .curved-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 45%;
+      background: linear-gradient(135deg, #4a90e2, #2563eb, #1d4ed8);
+      clip-path: ellipse(100% 100% at 50% 0%);
+      z-index: 1;
+    }
+
+    .curved-bg::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+      clip-path: ellipse(80% 80% at 30% 30%);
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8mm;
+    }
+
+    .top-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+    }
+
+    .logo {
+      border: 2px solid rgba(255,255,255,0.3);
+      width: 35px;
+      height: 35px;
+      border-radius: 8px;
+      line-height: 31px;
+      font-weight: bold;
+      color: white;
+      font-size: 11px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .company-name {
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    .photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #fff;
+      border: 3px solid rgba(255,255,255,0.8);
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .bottom-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .name {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1a1a1a;
+      line-height: 1.2;
+      text-align: center;
+      margin-bottom: 3px;
+    }
+
+    .details {
+      font-size: 10px;
+      color: #4a4a4a;
+      text-align: center;
+      margin-bottom: 2px;
+    }
+
+    .qr {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .qr img {
+      width: 90px;
+      height: 90px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      z-index: 1000;
+      min-width: 280px;
+      border: 1px solid #e0e0e0;
+    }
+
+    .controls-title {
+      color: #333;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .size-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group label {
+      color: #555;
+      font-size: 12px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      padding: 8px 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-button {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+    }
+
+    .export-button {
+      background: linear-gradient(135deg, #2196F3, #1976D2);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    }
+
+    .export-button:hover {
+      box-shadow: 0 6px 16px rgba(33, 150, 243, 0.4);
+    }
+
+    .print-button {
+      background: linear-gradient(135deg, #FF9800, #F57C00);
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    }
+
+    .print-button:hover {
+      box-shadow: 0 6px 16px rgba(255, 152, 0, 0.4);
+    }
+
+    .preset-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .preset-button {
+      background: #f5f5f5;
+      color: #666;
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s ease;
+    }
+
+    .preset-button:hover {
+      background: #e8e8e8;
+      color: #333;
+    }
+
+    @media print {
+      .controls-panel {
+        display: none;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+  <div class="controls-panel">
+    <div class="controls-title">📐 Card Settings</div>
+    
+    <div class="preset-buttons">
+      <button class="preset-button" onclick="setPresetSize(530, 920)">Standard</button>
+      <button class="preset-button" onclick="setPresetSize(400, 640)">Compact</button>
+      <button class="preset-button" onclick="setPresetSize(600, 1000)">Large</button>
+      <button class="preset-button" onclick="setPresetSize(350, 550)">Mini</button>
+    </div>
+
+    <div class="size-controls">
+      <div class="input-group">
+        <label for="cardWidth">Width (px)</label>
+        <input type="number" id="cardWidth" value="530" min="200" max="1000">
+      </div>
+      <div class="input-group">
+        <label for="cardHeight">Height (px)</label>
+        <input type="number" id="cardHeight" value="920" min="300" max="1500">
+      </div>
+    </div>
+
+    <div class="button-group">
+      <button class="action-button" onclick="applyCustomSize()">✨ Apply Size</button>
+      <button class="action-button export-button" onclick="downloadAllCards()">📷 Download PNG</button>
+      <button class="action-button export-button" onclick="downloadSingleCard()">📷 Download Single</button>
+      <button class="action-button print-button" onclick="window.print()">🖨️ Print Cards</button>
+    </div>
+  </div>
+
+  <h2 class="page-title">Aitrich Student ID Cards</h2>
+
+  <div id="cardContainer"></div>
+
+  <script>
+    // Sample student data - replace with your actual data
+    const students = [
+      { id: "STU001", name: "John Doe" },
+      { id: "STU002", name: "Jane Smith" },
+      { id: "STU003", name: "Mike Johnson" },
+      { id: "STU004", name: "Sarah Wilson" },
+      { id: "STU005", name: "David Brown" },
+      { id: "STU006", name: "Emily Davis" }
+    ];
+
+    function toBase64(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function () {
+          const canvas = document.createElement('canvas');
+          canvas.width = this.width;
+          canvas.height = this.height;
+          canvas.getContext('2d').drawImage(this, 0, 0);
+          resolve(canvas.toDataURL());
+        };
+        img.onerror = () => {
+          // Fallback to a simple colored rectangle if image fails
+          const canvas = document.createElement('canvas');
+          canvas.width = 100;
+          canvas.height = 100;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#4a90e2';
+          ctx.fillRect(0, 0, 100, 100);
+          ctx.fillStyle = 'white';
+          ctx.font = '20px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('LOGO', 50, 55);
+          resolve(canvas.toDataURL());
+        };
+        img.src = url;
+      });
+    }
+
+    const container = document.getElementById("cardContainer");
+    const cardsPerPage = 4;
+
+    async function generateCards(students) {
+      container.innerHTML = '';
+      
+      for (let i = 0; i < students.length; i += cardsPerPage) {
+        const pageStudents = students.slice(i, i + cardsPerPage);
+
+        const pageContainer = document.createElement("div");
+        pageContainer.className = "page-container";
+
+        for (const student of pageStudents) {
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(student.id)}&size=200x200`;
+          const qrBase64 = await toBase64(qrUrl);
+
+          const card = document.createElement("div");
+          card.className = "id-card";
+
+          card.innerHTML = `
+            <div class="curved-bg"></div>
+            <div class="card-content">
+              <div class="top-section">
+                <div class="photo" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNGE5MGUyIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TE9HTzwvdGV4dD4KPHN2Zz4=')"></div>
+              </div>
+              <div class="bottom-section">
+                <div class="name">${student.name}</div>
+                <div class="details">
+                  <p><strong>ID:</strong> ${student.id}</p>
+                </div>
+                <div class="qr">
+                  <img src="${qrBase64}" alt="QR Code">
+                </div>
+              </div>
+            </div>
+          `;
+
+          pageContainer.appendChild(card);
+        }
+
+        container.appendChild(pageContainer);
+      }
+    }
+
+    function setPresetSize(width, height) {
+      document.getElementById('cardWidth').value = width;
+      document.getElementById('cardHeight').value = height;
+      applyCustomSize();
+    }
+
+    function applyCustomSize() {
+      const width = document.getElementById('cardWidth').value;
+      const height = document.getElementById('cardHeight').value;
+      
+      const cards = document.querySelectorAll('.id-card');
+      cards.forEach(card => {
+        card.style.width = width + 'px';
+        card.style.height = height + 'px';
+      });
+    }
+
+    function downloadAllCards() {
+      const width = parseInt(document.getElementById('cardWidth').value);
+      const height = parseInt(document.getElementById('cardHeight').value);
+      
+      const cards = document.querySelectorAll('.id-card');
+      cards.forEach((card, index) => {
+        html2canvas(card, {
+          width: width,
+          height: height,
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `student_card_${index + 1}_${width}x${height}.png`;
+          link.href = canvas.toDataURL('image/png', 1.0);
+          link.click();
+        });
+      });
+    }
+
+    function downloadSingleCard() {
+      const width = parseInt(document.getElementById('cardWidth').value);
+      const height = parseInt(document.getElementById('cardHeight').value);
+      
+      const firstCard = document.querySelector('.id-card');
+      if (firstCard) {
+        html2canvas(firstCard, {
+          width: width,
+          height: height,
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `sample_student_card_${width}x${height}.png`;
+          link.href = canvas.toDataURL('image/png', 1.0);
+          link.click();
+        });
+      }
+    }
+
+    // Initialize cards
+    generateCards(students);
+  </script>
+</body>
+
+</html>
